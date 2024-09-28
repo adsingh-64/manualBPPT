@@ -149,7 +149,8 @@ for i in range(100):
         dhT = dlogits[:, -1, :] @ V
         dhs = [dhT]
         for i in range(1, block_size):
-            dhs.append(dhs[i - 1]@ torch.diag((1 - intermediate_tensors[-i] ** 2).view(-1))@ W + dlogits[:, -(i + 1), :] @ V)
+            dhs.append(dhs[i - 1] @ ((1 - intermediate_tensors[-i] ** 2).view(-1, 1) * W) + dlogits[:, -(i + 1), :] @ V)
+            #dhs.append(dhs[i - 1]@ torch.diag((1 - intermediate_tensors[-i] ** 2).view(-1))@ W + dlogits[:, -(i + 1), :] @ V)
 
         dc = dlogits.sum(dim=1)
 
@@ -193,7 +194,9 @@ print(f"Val loss with manual backward pass model: {loss.item()}")
 
 """
 Output with current model settings:
+----------------------------------------------------------------
 Val loss with PyTorch backward pass model: 4.147759437561035
 Val loss with manual backward pass model: 4.147759437561035
+----------------------------------------------------------------
 Yay!
 """
